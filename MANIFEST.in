@@ -1,0 +1,2 @@
+graft flask_swagger_ui/static
+graft flask_swagger_ui/templates
