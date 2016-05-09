@@ -1,4 +1,5 @@
 # -*- coding: utf8 -*-
+import os
 from urlparse import urlparse
 
 import yaml
@@ -69,7 +70,8 @@ def get_netloc():
 
 
 def create_blueprint(import_name):
-    bp = Blueprint('swagger_ui', import_name)
+    bp = Blueprint('swagger_ui', import_name, template_folder='templates',
+                   static_folder='static', static_url_path='/static/swagger')
     bp.route('/spec', endpoint='spec')(spec)
     bp.route('/o2c.html', endpoint='o2c')(oauth2callback)
     bp.route('/', endpoint='swagger_ui')(swagger_ui_view)
