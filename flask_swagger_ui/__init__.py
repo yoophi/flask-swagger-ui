@@ -20,6 +20,7 @@ class Singleton(object):
 
 class SwaggerUI(Singleton):
     app = None
+    params = {'OAUTH_CLIENT_ID': 'foo', 'OAUTH_CLIENT_SECRET': 'secret'}
     spec = {
         'info': {},
         'schemes': [],
@@ -34,7 +35,7 @@ class SwaggerUI(Singleton):
         if app:
             self.init_app(app, **kwargs)
 
-    def init_app(self, app, info=None, spec=None, spec_yaml=None, url_prefix='/swagger'):
+    def init_app(self, app, info=None, spec=None, spec_yaml=None, url_prefix='/swagger', params={}):
         if spec:
             self.spec = dict(spec)
 
@@ -43,6 +44,9 @@ class SwaggerUI(Singleton):
 
         if info:
             self.spec['info'].update(info)
+
+        if params:
+            self.params.update(params)
 
         app.register_blueprint(create_blueprint(__name__), url_prefix=url_prefix)
 
@@ -61,7 +65,8 @@ def oauth2callback():
 
 def swagger_ui_view():
     return render_template('swagger_ui.html',
-                           swagger_spec_url=url_for('swagger_ui.spec', _external=True))
+                           swagger_spec_url=url_for('swagger_ui.spec', _external=True),
+                           **SwaggerUI().params)
 
 
 def get_netloc():
