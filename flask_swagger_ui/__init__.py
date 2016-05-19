@@ -20,7 +20,7 @@ class Singleton(object):
 
 class SwaggerUI(Singleton):
     app = None
-    params = {'OAUTH_CLIENT_ID': 'foo', 'OAUTH_CLIENT_SECRET': 'secret'}
+    params = {'OAUTH_CLIENT_ID': 'foo', 'OAUTH_CLIENT_SECRET': 'secret', 'LOGO_TITLE': 'swagger', }
     spec = {
         'info': {},
         'schemes': [],
@@ -28,7 +28,7 @@ class SwaggerUI(Singleton):
         'tags': [],
         'definitions': [],
         'securityDefinitions': [],
-        'externalDocs': {}
+        'externalDocs': {},
     }
 
     def __init__(self, app=None, **kwargs):
@@ -64,6 +64,7 @@ def oauth2callback():
 
 
 def swagger_ui_view():
+    print SwaggerUI().params
     return render_template('swagger_ui.html',
                            swagger_spec_url=url_for('swagger_ui.spec', _external=True),
                            **SwaggerUI().params)
