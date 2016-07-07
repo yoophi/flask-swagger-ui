@@ -43,6 +43,7 @@ setup(
     platforms='any',
     install_requires=[
         'PyYAML==3.11',
+        'Flask-Swagger==0.2.12',
     ],
     classifiers=[
         'Environment :: Web Environment',
