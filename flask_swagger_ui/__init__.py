@@ -4,9 +4,9 @@ from urlparse import urlparse
 
 import yaml
 from flask import Blueprint, render_template, jsonify, current_app, url_for
-from flask.ext.swagger import swagger
+from flask.ext.swagger import swagger, _parse_docstring, _sanitize
 
-__version__ = '0.1'
+__version__ = '0.1.1'
 
 
 class Singleton(object):
@@ -49,6 +49,15 @@ class SwaggerUI(Singleton):
             self.params.update(params)
 
         app.register_blueprint(create_blueprint(__name__), url_prefix=url_prefix)
+
+    def add_schema(self, schema_class):
+        """
+        schema class 의 내용을 추출하여 swagger spec 에 추가한다.
+        :param schema_class:
+        :return:
+        """
+        name, _, swag = _parse_docstring(schema_class, _sanitize)
+        self.spec['definitions'][name] = swag
 
 
 def spec():
