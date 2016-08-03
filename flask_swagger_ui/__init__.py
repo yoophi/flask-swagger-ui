@@ -35,20 +35,25 @@ class SwaggerUI(Singleton):
         if app:
             self.init_app(app, **kwargs)
 
-    def init_app(self, app, info=None, spec=None, spec_yaml=None, url_prefix='/swagger', params={}):
-        if spec:
-            self.spec = dict(spec)
+    def init_app(self, app, info=None,
+                 oauth_authorize=None,
+                 oauth_access_token=None,
+                 spec=None, spec_yaml=None, url_prefix='/swagger', params={}):
+        if app.config['DEBUG']:
+            if spec:
+                self.spec = dict(spec)
 
-        if spec_yaml:
-            self.spec = yaml.load(spec_yaml)
+            if spec_yaml:
+                self.spec = yaml.load(spec_yaml)
 
-        if info:
-            self.spec['info'].update(info)
+            if info:
+                self.spec['info'].update(info)
 
-        if params:
-            self.params.update(params)
+            if params:
+                self.params.update(params)
 
-        app.register_blueprint(create_blueprint(__name__), url_prefix=url_prefix)
+            app.register_blueprint(create_blueprint(__name__, oauth_authorize=oauth_authorize, oauth_access_token=oauth_access_token),
+                                   url_prefix=url_prefix)
 
     def add_schema(self, schema_class):
         """
@@ -84,11 +89,21 @@ def get_netloc():
     return parsed_url.netloc
 
 
-def create_blueprint(import_name):
+def create_blueprint(import_name, oauth_authorize=None, oauth_access_token=None):
     bp = Blueprint('swagger_ui', import_name, template_folder='templates',
                    static_folder='static', static_url_path='/static/swagger')
     bp.route('/spec', endpoint='spec')(spec)
     bp.route('/o2c.html', endpoint='o2c')(oauth2callback)
     bp.route('/', endpoint='swagger_ui')(swagger_ui_view)
+
+    if oauth_authorize and oauth_access_token:
+        def setup_oauth_url():
+            SwaggerUI().spec["securityDefinitions"]["oauth"]["authorizationUrl"] = url_for(oauth_authorize, _external=True)
+            SwaggerUI().spec['info']['description'] = SwaggerUI().spec['info']['description'].replace(
+                '{{OAUTH_AUTHORIZE_URL}}',
+                url_for(oauth_access_token, _external=True)
+            )
+
+        bp.before_app_first_request(setup_oauth_url)
 
     return bp
