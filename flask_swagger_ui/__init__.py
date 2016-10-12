@@ -1,26 +1,27 @@
 # -*- coding: utf8 -*-
-import os
 from urlparse import urlparse
 
 import yaml
 from flask import Blueprint, render_template, jsonify, current_app, url_for
-from flask.ext.swagger import swagger, _parse_docstring, _sanitize
+from flask_swagger import swagger, _parse_docstring, _sanitize
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 
 class Singleton(object):
     _instance = None
 
-    def __new__(class_, *args, **kwargs):
-        if not isinstance(class_._instance, class_):
-            class_._instance = object.__new__(class_, *args, **kwargs)
-        return class_._instance
+    def __new__(cls, *args, **kwargs):
+        if not isinstance(cls._instance, cls):
+            cls._instance = object.__new__(cls, *args, **kwargs)
+        return cls._instance
 
 
 class SwaggerUI(Singleton):
     app = None
-    params = {'OAUTH_CLIENT_ID': 'foo', 'OAUTH_CLIENT_SECRET': 'secret', 'LOGO_TITLE': 'swagger', }
+    params = {'OAUTH_CLIENT_ID': 'swagger',
+              'OAUTH_CLIENT_SECRET': 'secret',
+              'LOGO_TITLE': 'swagger', }
     spec = {
         'info': {},
         'schemes': [],
@@ -35,10 +36,14 @@ class SwaggerUI(Singleton):
         if app:
             self.init_app(app, **kwargs)
 
-    def init_app(self, app, info=None,
+    def init_app(self, app,
+                 info=None,
                  oauth_authorize=None,
                  oauth_access_token=None,
-                 spec=None, spec_yaml=None, url_prefix='/swagger', params={}):
+                 spec=None,
+                 spec_yaml=None,
+                 url_prefix='/swagger',
+                 params={}):
         if app.config['DEBUG']:
             if spec:
                 self.spec = dict(spec)
@@ -52,8 +57,11 @@ class SwaggerUI(Singleton):
             if params:
                 self.params.update(params)
 
-            app.register_blueprint(create_blueprint(__name__, oauth_authorize=oauth_authorize, oauth_access_token=oauth_access_token),
-                                   url_prefix=url_prefix)
+            app.register_blueprint(
+                create_blueprint(__name__,
+                                 oauth_authorize=oauth_authorize,
+                                 oauth_access_token=oauth_access_token),
+                url_prefix=url_prefix)
 
     def add_schema(self, schema_class):
         """
@@ -78,10 +86,8 @@ def oauth2callback():
 
 
 def swagger_ui_view():
-    print SwaggerUI().params
-    return render_template('swagger_ui.html',
-                           swagger_spec_url=url_for('swagger_ui.spec', _external=True),
-                           **SwaggerUI().params)
+    swagger_spec_url = url_for('swagger_ui.spec', _external=True)
+    return render_template('swagger_ui.html', swagger_spec_url=swagger_spec_url, **SwaggerUI().params)
 
 
 def get_netloc():
@@ -98,11 +104,11 @@ def create_blueprint(import_name, oauth_authorize=None, oauth_access_token=None)
 
     if oauth_authorize and oauth_access_token:
         def setup_oauth_url():
-            SwaggerUI().spec["securityDefinitions"]["oauth"]["authorizationUrl"] = url_for(oauth_authorize, _external=True)
+            authorize_url = url_for(oauth_authorize, _external=True)
+            access_token_url = url_for(oauth_access_token, _external=True)
+            SwaggerUI().spec["securityDefinitions"]["oauth"]["authorizationUrl"] = authorize_url
             SwaggerUI().spec['info']['description'] = SwaggerUI().spec['info']['description'].replace(
-                '{{OAUTH_AUTHORIZE_URL}}',
-                url_for(oauth_access_token, _external=True)
-            )
+                '{{OAUTH_AUTHORIZE_URL}}', access_token_url)
 
         bp.before_app_first_request(setup_oauth_url)
 
