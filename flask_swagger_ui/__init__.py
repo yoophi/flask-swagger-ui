@@ -5,7 +5,7 @@ import yaml
 from flask import Blueprint, render_template, jsonify, current_app, url_for
 from flask_swagger import swagger, _parse_docstring, _sanitize
 
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 
 class Singleton(object):
