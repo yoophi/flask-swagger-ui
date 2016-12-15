@@ -5,7 +5,7 @@ import yaml
 from flask import Blueprint, render_template, jsonify, current_app, url_for
 from flask_swagger import swagger, _parse_docstring, _sanitize
 
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 
 
 class Singleton(object):
@@ -74,7 +74,9 @@ class SwaggerUI(Singleton):
 
 
 def spec():
-    swag = swagger(current_app)
+    prefix = current_app.config.get('SWAGGER_UI_API_PREFIX', None)
+
+    swag = swagger(current_app, prefix=prefix)
     swag.update(SwaggerUI().spec)
     swag.update({'host': get_netloc()})
 

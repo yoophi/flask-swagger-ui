@@ -47,7 +47,7 @@ setup(
         'flask_swagger',
     ],
     dependency_links=[
-        'git+https://github.com/yoophi/flask-swagger.git@9e2868fbe6947e8c8cc312b12d7abe8892759773#egg=flask_swagger'
+        'git+https://github.com/yoophi/flask-swagger.git@7da084669bd29e9ea6612059d2efd349d5eeca81#egg=flask_swagger'
     ],
     classifiers=[
         'Environment :: Web Environment',
