@@ -44,6 +44,10 @@ setup(
     install_requires=[
         'PyYAML==3.11',
         'Flask-Swagger==0.2.12',
+        'flask_swagger',
+    ],
+    dependency_links=[
+        'git+https://github.com/yoophi/flask-swagger.git@9e2868fbe6947e8c8cc312b12d7abe8892759773#egg=flask_swagger'
     ],
     classifiers=[
         'Environment :: Web Environment',
