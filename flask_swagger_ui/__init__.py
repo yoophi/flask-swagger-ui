@@ -78,7 +78,6 @@ def oauth2callback():
 
 
 def swagger_ui_view():
-    print SwaggerUI().params
     return render_template('swagger_ui.html',
                            swagger_spec_url=url_for('swagger_ui.spec', _external=True),
                            **SwaggerUI().params)
