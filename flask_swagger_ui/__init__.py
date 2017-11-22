@@ -76,7 +76,7 @@ class SwaggerUI(Singleton):
 def spec():
     prefix = current_app.config.get('SWAGGER_UI_API_PREFIX', None)
 
-    swag = swagger(current_app, prefix=prefix)
+    swag = swagger(current_app)
     swag.update(SwaggerUI().spec)
     swag.update({'host': get_netloc()})
 
