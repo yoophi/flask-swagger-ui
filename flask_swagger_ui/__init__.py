@@ -5,7 +5,7 @@ import yaml
 from flask import Blueprint, render_template, jsonify, current_app, url_for
 from flask_swagger import swagger, _parse_docstring, _sanitize
 
-__version__ = '0.1.4'
+__version__ = '0.1.5'
 
 
 class Singleton(object):
@@ -43,8 +43,10 @@ class SwaggerUI(Singleton):
                  spec=None,
                  spec_yaml=None,
                  url_prefix='/swagger',
+                 hide_in_production=True,
                  params={}):
-        if app.config['DEBUG']:
+
+        if not hide_in_production or app.config['DEBUG']:
             if spec:
                 self.spec = dict(spec)
 
