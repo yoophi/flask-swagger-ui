@@ -27,7 +27,7 @@ class SwaggerUI(Singleton):
         'schemes': [],
         'produces': ['application/json'],
         'tags': [],
-        'definitions': [],
+        'definitions': {},
         'securityDefinitions': [],
         'externalDocs': {},
     }
